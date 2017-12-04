@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Forest Covertype Mining</title>
+
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.js"></script>
+
+</head>
+
+
+<body ng-app="forestCovertype">
+    <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/"> <span class="glyphicon glyphicon-log-out" aria-hidden="true">&nbsp;</span>
+                    Signout</a></li> 
+            </ul>
+        </div>
+       
+    </div>
+    
+    </nav> 
+
+    <div id="wrapper" class="toggled">     
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#home">
+                        Forest Covertype
+                    </a>
+                </li>
+                <li>
+                    <a href="#fileUpload">File Upload</a>
+                </li>
+                <li>
+                    <a href="#preProcessing">Preprocessing</a>
+                </li>
+                <li>
+                    <a href="#featureSelection">Feature Selection</a>
+                </li>
+                <li>
+                    <a href="#modelSelection">Model Selection</a>
+                </li>
+                <li>
+                    <a href="#results">Results</a>
+                </li>
+                <li>
+                    <a href="#graphs">Graphs</a>
+                </li>
+               
+            </ul>
+        </div>
+        
+
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                
+            </div>
+
+            <div ng-view=""></div>
+        </div>
+        
+
+    </div>
+   
+
+<script>
+    var forestCovertype = angular.module("forestCovertype", ['ngRoute','ui']);
+    forestCovertype.config(function ($routeProvider) 
+    {
+
+        $routeProvider.when("/home", {
+            templateUrl: "../angular/home.html"
+        }).when("/fileUpload", {
+            templateUrl: "../angular/fileUpload.html"
+        }).when("/preProcessing", {
+            templateUrl: "../angular/preProcessing.html"
+        }).when("/featureSelection", {
+            templateUrl: "../angular/featureSelection.html"
+        }).when("/modelSelection", {
+            templateUrl: "../angular/modelSelection.html"
+        }).when("/results", {
+            templateUrl: "../angular/displayResults.html"
+        }).otherwise({
+            templateUrl: "../angular/graphs.html"
+        });
+    });
+
+    forestCovertype.controller("homeCtrl", function ($scope, $http) 
+    {
+
+    });
+
+    forestCovertype.controller("preprocessingCtrl", function ($scope, $http) 
+    {
+
+    });
+    
+
+    forestCovertype.controller('fileUploadCtrl', function ($scope, $http) {
+
+        $scope.myFunc = function(file, uploadUrl)
+        {
+
+            var fd = new FormData();
+            fd.append('file', file);
+            $http.post(uploadUrl, fd, {
+                //alert("Hello");
+                transformRequest: angular.identity,
+                headers: {'Content-Type': undefined}
+            })
+            .success(function(){
+              console.log("success");
+            })
+            .error(function(){
+              console.log("failure");
+            });
+
+        }   
+    });
+
+    forestCovertype.controller("featureSelectionCtrl", function ($scope, $http) 
+    {
+
+        $scope.getFeatures = function() {
+            $http({
+              method: "GET",
+              url: 'http://localhost:5000/features'
+
+          }).then(function(response) {
+                      // success
+                      console.log(response.data);
+                      //$scope.features = [];
+                      $scope.features = response.data;
+                      /*console.log(features);*/
+                      console.log("success");
+              }, 
+              function(error) { // optional
+                      // failed
+                      console.log("failed");
+              });
+
+          }
+
+          $scope.selected = {};
+          $scope.ShowSelected = function() {
+            $scope.features = $.grep($scope.features, function( feature ) {
+              return $scope.selected[ feature.Column ];
+            });
+          };  
+
+          $scope.updateFeatures = function() {
+            $http({
+              method: "POST",
+              url: 'http://localhost:5000/updatefeatures',
+              data: { 'features' : $scope.features }
+
+          }).then(function(response) {
+                      //success
+                      console.log("success");
+              }, 
+              function(error) { // optional
+                      // failed
+                      console.log("failed");
+              });
+
+          }
+     
+    });
+
+    forestCovertype.controller("resultsCtrl", function ($scope, $http)
+    {
+
+    });
+
+    forestCovertype.controller("graphsCtrl", function ($scope, $http)
+    {
+
+    });
+
+    forestCovertype.controller("modelSelectionCtrl", function ($scope, $http) 
+    {
+         $scope.myFunc = function()
+          {
+      
+              console.log("checking here");
+              var e = document.getElementById("modelValue").value;
+              console.log(e);
+              $scope.title = "message"
+                $http({
+                  url: 'http://127.0.0.1:5000/value',
+                  method: "POST",
+                  data: { 'message' : $scope.title }
+              })
+              .then(function(response) {
+                      
+                      console.log("success");
+              }, 
+              function(response) { 
+                      
+                      console.log("failed");
+              });
+          };
+    });
+
+
+forestCovertype.directive('file', function () {
+    return {
+        scope: {
+            file: '='
+        },
+        link: function (scope, el, attrs) {
+            el.bind('change', function (event) {
+                var file = event.target.files[0];
+                scope.file = file ? file : undefined;
+                scope.$apply();
+            });
+        }
+    };
+});
+</script>
+
+</body>
+
+</html>
+
+
+
+ 
