@@ -19,6 +19,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.js"></script>
 
+    <link rel="shortcut icon" href="">
+
 </head>
 
 
@@ -51,20 +53,13 @@
                 <li>
                     <a href="#fileUpload">File Upload</a>
                 </li>
+                
                 <li>
-                    <a href="#preProcessing">Preprocessing</a>
+                    <a href="#featureModelSelection"> Feature Model Selection</a>
                 </li>
+               
                 <li>
-                    <a href="#featureSelection">Feature Selection</a>
-                </li>
-                <li>
-                    <a href="#modelSelection">Model Selection</a>
-                </li>
-                <li>
-                    <a href="#results">Results</a>
-                </li>
-                <li>
-                    <a href="#graphs">Graphs</a>
+                    <a href="#resultsGraphs">Results and Graphs</a>
                 </li>
                
             </ul>
@@ -84,7 +79,7 @@
    
 
 <script>
-    var forestCovertype = angular.module("forestCovertype", ['ngRoute','ui']);
+    var forestCovertype = angular.module("forestCovertype", ['ngRoute','ui']);/* ["checklist-model"] ,'checklist-model'*/
     forestCovertype.config(function ($routeProvider) 
     {
 
@@ -92,12 +87,8 @@
             templateUrl: "../angular/home.html"
         }).when("/fileUpload", {
             templateUrl: "../angular/fileUpload.html"
-        }).when("/preProcessing", {
-            templateUrl: "../angular/preProcessing.html"
-        }).when("/featureSelection", {
-            templateUrl: "../angular/featureSelection.html"
-        }).when("/modelSelection", {
-            templateUrl: "../angular/modelSelection.html"
+        }).when("/featureModelSelection", {
+            templateUrl: "../angular/featureModelSelection.html"
         }).when("/results", {
             templateUrl: "../angular/displayResults.html"
         }).otherwise({
@@ -105,15 +96,14 @@
         });
     });
 
+    
+
     forestCovertype.controller("homeCtrl", function ($scope, $http) 
     {
 
     });
 
-    forestCovertype.controller("preprocessingCtrl", function ($scope, $http) 
-    {
-
-    });
+   
     
 
     forestCovertype.controller('fileUploadCtrl', function ($scope, $http) {
@@ -130,6 +120,7 @@
             })
             .success(function(){
               console.log("success");
+              window.location.href = "#featureModelSelection";
             })
             .error(function(){
               console.log("failure");
@@ -138,7 +129,16 @@
         }   
     });
 
-    forestCovertype.controller("featureSelectionCtrl", function ($scope, $http) 
+    forestCovertype.controller("resultsCtrl", function ($scope, $http)
+    {
+
+    });
+
+    forestCovertype.controller("graphsCtrl", function ($scope, $http)
+    {
+
+    });
+    forestCovertype.controller("featureModelSelectionCtrl", function ($scope, $http)
     {
 
         $scope.getFeatures = function() {
@@ -161,18 +161,63 @@
 
           }
 
-          $scope.selected = {};
+          /*$scope.selected = {
+            features: ['selected']
+          };
+          $scope.checkAll = function() {
+            $scope.selected.features = angular.copy($scope.features);
+          };
+          $scope.uncheckAll = function() {
+            $scope.selected.features = [];
+          };
+          console.log($scope.selected);*/
+
+          /*$scope.selected = {};
           $scope.ShowSelected = function() {
             $scope.features = $.grep($scope.features, function( feature ) {
-              return $scope.selected[ feature.Column ];
+              return $scope.selected[ feature ];
             });
-          };  
+          };  */
+          $scope.selected = {};
+          $scope.ShowSelected = function() {
+            console.log($scope.selected);
+            alert(JSON.stringify($scope.selected));
+          };
+
+          $scope.selected1 = {};
+          $scope.title ={};
+          $scope.title1 = {}
+          $scope.ShowSelected1 = function() {
+            console.log($scope.selected1);
+            alert(JSON.stringify($scope.selected1));
+          };
+          $scope.title1 = document.getElementById("modelValue1").value;
+          $scope.title = document.getElementById("modelValue").value;
+
+          /*$scope.selection = [];
+
+          // Toggle selection for a given fruit by name
+          $scope.toggleSelection = function toggleSelection(feature) {
+            var idx = $scope.selection.indexOf(feature);
+
+            // Is currently selected
+            if (idx > -1) {
+              $scope.selection.splice(idx, 1);
+            }
+
+            // Is newly selected
+            else {
+              $scope.selection.push(feature);
+            }
+          };
+          console.log($scope.selection);*/
 
           $scope.updateFeatures = function() {
             $http({
               method: "POST",
               url: 'http://localhost:5000/updatefeatures',
-              data: { 'features' : $scope.features }
+              data: { 'features' : $scope.selected } /*features*/
+              /*data: { 'message' : $scope.title }*/
 
           }).then(function(response) {
                       //success
@@ -184,32 +229,37 @@
               });
 
           }
-     
-    });
 
-    forestCovertype.controller("resultsCtrl", function ($scope, $http)
-    {
+           $scope.updateFeatures1 = function() {
+            $http({
+              method: "POST",
+              url: 'http://localhost:5000/updatefeatures1',
+              data: { 'features1' : $scope.selected1 } /*features*/
+              /*data: { 'message' : $scope.title }*/
 
-    });
+          }).then(function(response) {
+                      //success
+                      console.log("success");
+              }, 
+              function(error) { // optional
+                      // failed
+                      console.log("failed");
+              });
 
-    forestCovertype.controller("graphsCtrl", function ($scope, $http)
-    {
+          }
 
-    });
 
-    forestCovertype.controller("modelSelectionCtrl", function ($scope, $http) 
-    {
-         $scope.myFunc = function()
+        $scope.myFunc = function()
           {
       
               console.log("checking here");
-              var e = document.getElementById("modelValue").value;
-              console.log(e);
-              $scope.title = "message"
+              $scope.title = document.getElementById("modelValue").value;
+              /*console.log(e);*/
+              /*$scope.title = algorithm*/
                 $http({
                   url: 'http://127.0.0.1:5000/value',
                   method: "POST",
-                  data: { 'message' : $scope.title }
+                  data: { 'algorithm' : $scope.title }
               })
               .then(function(response) {
                       
@@ -220,8 +270,56 @@
                       console.log("failed");
               });
           };
+
+          $scope.myFunc1 = function()
+          {
+      
+              console.log("checking here");
+              $scope.title1 = document.getElementById("modelValue1").value;
+              /*console.log(e);*/
+              /*$scope.title1 = model*/
+                $http({
+                  url: 'http://127.0.0.1:5000/value1',
+                  method: "POST",
+                  data: { 'model' : $scope.title1 }
+              })
+              .then(function(response) {
+                      
+                      console.log("success");
+              }, 
+              function(response) { 
+                      
+                      console.log("failed");
+              });
+          };
+
+          $scope.submitAllFeatures = function()
+          {
+                console.log("checking here for submit al features");
+                alert("Hello");
+                 $scope.title1 = document.getElementById("modelValue1").value;
+          $scope.title = document.getElementById("modelValue").value;
+
+                console.log("submit all features")
+                $http({
+                  url: 'http://127.0.0.1:5000/submittedfeatures',
+                  method: "POST",
+                  data: { 'features' : $scope.selected,'features1' : $scope.selected1, 'algorithm' : $scope.title, 'model': $scope.title1  }
+              })
+              .then(function(response) {
+                      
+                      console.log("success");
+              }, 
+              function(response) { 
+                      
+                      console.log("failed");
+              });
+          };
+
     });
 
+    
+/*'features' : $scope.selected,'features1' : $scope.selected1, 'algorithm' : $scope.title,*/
 
 forestCovertype.directive('file', function () {
     return {
@@ -245,4 +343,31 @@ forestCovertype.directive('file', function () {
 
 
 
- 
+ <!--  <li>
+                    <a href="#results">Results</a>
+                </li>
+                <li>
+                    <a href="#graphs">Graphs</a>
+                </li> -->
+
+<!-- 
+.when("/preProcessing", {
+            templateUrl: "../angular/preProcessing.html"
+        }).when("/featureSelection", {
+            templateUrl: "../angular/featureSelection.html"
+        }) -->
+
+
+<!-- <li>
+                    <a href="#preProcessing">Preprocessing</a>
+                </li>
+                <li>
+                    <a href="#featureSelection">Feature Selection</a>
+                </li> -->
+
+
+
+               <!--   forestCovertype.controller("preprocessingCtrl", function ($scope, $http) 
+    {
+
+    }); -->
